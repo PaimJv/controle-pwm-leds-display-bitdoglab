@@ -1,60 +1,58 @@
-# Controle de Servomotor por PWM com Raspberry Pi Pico W
+# Controle de LEDs e Display com Joystick no Raspberry Pi Pico W
 
 ## Descrição do Projeto
-Este projeto utiliza o microcontrolador **Raspberry Pi Pico W** para controlar um **servo motor** através de um sinal **PWM (Pulse Width Modulation)**. O código foi desenvolvido utilizando a ferramenta **Pico SDK** e pode ser simulado na plataforma online **Wokwi**.
+Este projeto utiliza um **Raspberry Pi Pico W** e a placa **BitDogLab** para controlar um **LED RGB** e um **display OLED SSD1306** via joystick. O joystick fornece valores analógicos que são utilizados para ajustar a intensidade dos LEDs e movimentar um quadrado no display.
 
 ## Vídeo de demonstração
-https://youtu.be/t99qElfitgs
 
-## Objetivo
-O objetivo deste projeto é demonstrar como controlar o **ângulo do servo motor** ajustando o ciclo de trabalho (duty cycle) do sinal PWM gerado pelo **RP2040**, microcontrolador presente no Raspberry Pi Pico W.
+
+## Objetivos
+- Compreender o funcionamento do conversor Analógico-Digital (ADC) no RP2040.
+- Utilizar **PWM** para controlar a intensidade luminosa de dois LEDs RGB com base nos valores do joystick.
+- Representar a posição do joystick no display **SSD1306** através de um quadrado móvel.
+- Aplicar o protocolo de comunicação **I2C** para interação com o display.
+- Implementar interrupções para lidar com eventos de botão.
+
+## Funcionalidades
+### Controle dos LEDs RGB
+- **LED Azul (GPIO 12)**: Brilho ajustado com base no eixo **Y** do joystick.
+  - Posição central (2048): LED apagado.
+  - Movimento para cima ou para baixo aumenta a intensidade até o máximo (0 ou 4095).
+- **LED Vermelho (GPIO 13)**: Brilho ajustado com base no eixo **X** do joystick.
+  - Posição central (2048): LED apagado.
+  - Movimento para esquerda ou direita aumenta a intensidade até o máximo (0 ou 4095).
+
+### Movimentação no Display SSD1306 (128x64)
+- Um **quadrado de 8x8 pixels** se move proporcionalmente aos valores do joystick.
+- A posição do quadrado é atualizada conforme os eixos X e Y do joystick.
+
+### Controle via Botões
+- **Botão do Joystick (GPIO 22)**:
+  - Alterna o estado do **LED Verde (GPIO 11)** a cada acionamento.
+  - Altera o estilo da borda do display para indicar o acionamento.
+- **Botão A (GPIO 5)**:
+  - Ativa ou desativa os LEDs controlados por PWM.
 
 ## Componentes Utilizados
-1. **Microcontrolador Raspberry Pi Pico W**
-2. **Servomotor (Motor Micro Servo Padrão) - Simulador Wokwi**
+- **Raspberry Pi Pico W**;
+- **Placa BitDogLab**;
+- **Joystick (GPIO 26 e 27 para X/Y, GPIO 22 para botão)**;
+- **Display OLED SSD1306 (I2C - GPIO 14 e 15)**;
+- **LED RGB (GPIO 11, 12 e 13)**;
+- **Botão A (GPIO 5)**.
 
-## Configuração do PWM
-- **Frequência:** 50 Hz (Período de 20 ms)
-- **Pino de controle:** GPIO **22** (para simulação) ou GPIO **12** (para uso na placa real)
-- **Valores de Pulso:**
-  - **2400 µs** → **180 graus**
-  - **1470 µs** → **90 graus**
-  - **500 µs** → **0 graus**
-  
-## Funcionamento do Código
-O programa realiza os seguintes passos:
-1. Configura a **GPIO 22** para gerar um sinal PWM de **50 Hz**.
-2. Define o servo em três posições iniciais, aguardando **5 segundos** em cada uma:
-   - **180 graus (2400 µs)**
-   - **90 graus (1470 µs)**
-   - **0 graus (500 µs)**
-3. Cria um **movimento suave e contínuo** entre **0 e 180 graus**, ajustando o pulso em **incrementos de 5 µs** a cada **10 ms**.
+## Requisitos do Projeto
+1. **Uso de Interrupções:** Todas as funcionalidades dos botões devem ser implementadas com **IRQ**;
+2. **Debouncing:** Tratamento de bouncing via software;
+3. **Display 128x64:** Utilização de gráficos para exibição dos dados;
+4. **Organização do Código:** Estrutura bem definida e comentada para melhor compreensão.
 
-## Estrutura do Código
-O código principal é dividido em:
-1. **`config_servo_pwm()`** → Configura o PWM na GPIO definida.
-2. **`set_servo_us(uint us)`** → Define o pulso PWM baseado no tempo em microsegundos.
-3. **`smooth_movement(uint start_us, uint end_us)`** → Realiza a movimentação suave do servo entre dois ângulos.
-4. **`main()`** → Executa a lógica do projeto, movimentando o servo entre 0 e 180 graus repetidamente.
+## Como Executar
+1. Clone este repositório e compile o código para o Raspberry Pi Pico W;
+2. Conecte os componentes conforme o esquema de conexão;
+3. Faça o upload do código e execute o programa;
+4. Utilize o joystick para controlar os LEDs e o quadrado no display.
 
-## Requisitos e Critérios de Avaliação
-| Item | Requisito | Nota |
-|------|-----------|------|
-| 1 | Configuração do PWM na GPIO 22 com 50Hz | **20%** |
-| 2 | Ajuste do servo para 180 graus (2400µs) e espera de 5s | **10%** |
-| 3 | Ajuste do servo para 90 graus (1470µs) e espera de 5s | **10%** |
-| 4 | Ajuste do servo para 0 graus (500µs) e espera de 5s | **10%** |
-| 5 | Implementação do movimento suave entre 0 e 180 graus | **35%** |
-| 6 | Teste prático com LED RGB na GPIO 12 utilizando a BitDogLab | **15%** |
-
-## Experimento com o LED RGB (GPIO 12)
-Após rodar o código na **BitDogLab**, observe o comportamento do **LED RGB** conectado na **GPIO 12**. Pergunta para reflexão:
-- Como o LED reage enquanto o servo está se movimentando?
-
-## Como Rodar o Projeto
-1. Instale o **Pico SDK** e configure o ambiente para compilar código para o **RP2040**.
-2. Compile e carregue o programa no **Raspberry Pi Pico W**.
-3. Para simulação, use a plataforma **Wokwi**.
-
-## Considerações Finais
-Este projeto demonstra o uso do PWM para **controle preciso** de um servo motor, garantindo movimentação suave e periódica. Além disso, o experimento com o **LED RGB** permite avaliar como o **PWM** afeta outros componentes no mesmo circuito.
+## Como Simular
+1. Clone este repositório e compile o código;
+2. Abra o **diagram.json** e execute a simulação no Wokwi do VS Code.

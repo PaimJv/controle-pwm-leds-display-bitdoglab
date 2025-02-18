@@ -4,7 +4,7 @@
 Este projeto utiliza um **Raspberry Pi Pico W** e a placa **BitDogLab** para controlar um **LED RGB** e um **display OLED SSD1306** via joystick. O joystick fornece valores analógicos que são utilizados para ajustar a intensidade dos LEDs e movimentar um quadrado no display.
 
 ## Vídeo de demonstração
-
+https://youtu.be/jflbb4VRu6M
 
 ## Objetivos
 - Compreender o funcionamento do conversor Analógico-Digital (ADC) no RP2040.
